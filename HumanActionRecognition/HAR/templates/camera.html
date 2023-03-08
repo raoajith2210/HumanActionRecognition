@@ -1,0 +1,114 @@
+<!-- templates/camera.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Human Action Recognition</title>
+	<style>
+		body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        video {
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+            max-width: 640px;
+            border: 2px solid #4CAF50;
+        }
+	</style>
+</head>
+<body>
+	<h1>Human Action Recognition</h1>
+	<div id="video-container">
+		<video id="video-player"></video>
+		<button id="start-button">Start Recording</button>
+		<button id="stop-button" disabled>Stop Recording</button>
+		<button id="save-button" disabled>Save Video</button>
+        <p style="padding: 2rem;">
+            Action : <input type="text" name="action" disabled>
+        </p>
+	</div>
+
+	<script>
+		const videoPlayer = document.getElementById('video-player');
+		const startButton = document.getElementById('start-button');
+		const stopButton = document.getElementById('stop-button');
+		const saveButton = document.getElementById('save-button');
+		let recorder, stream, chunks = [];
+
+		const startRecording = async () => {
+			try {
+				chunks = [];
+				stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+				videoPlayer.srcObject = stream;
+				videoPlayer.play();
+
+				recorder = new MediaRecorder(stream);
+
+				recorder.ondataavailable = (e) => chunks.push(e.data);
+
+				recorder.onstop = (e) => {
+					const completeBlob = new Blob(chunks, { type: chunks[0].type });
+					videoPlayer.srcObject = null;
+					videoPlayer.src = URL.createObjectURL(completeBlob);
+					saveButton.disabled = false;
+				};
+
+				startButton.disabled = true;
+				stopButton.disabled = false;
+				recorder.start();
+			} catch (error) {
+				console.error(error);
+			}
+		};
+
+		const stopRecording = () => {
+			recorder.stop();
+			stream.getTracks().forEach(track => track.stop());
+			startButton.disabled = false;
+			stopButton.disabled = true;
+			saveButton.disabled = false;
+            saveRecording();
+		};
+
+		const saveRecording = () => {
+			const blob = new Blob(chunks, { type: chunks[0].type });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'recorded-video.webm';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		};
+
+		startButton.addEventListener('click', startRecording);
+		stopButton.addEventListener('click', stopRecording);
+		saveButton.addEventListener('click', saveRecording);
+	</script>
+</body>
+</html>
