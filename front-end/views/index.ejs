@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Human Action Recognition</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+  .bg-1 {
+    background-color: #1abc9c; /* Green */
+    color: #ffffff;
+  }
+  .container-fluid {
+    padding-top: 70px;
+    padding-bottom: 100px;
+  }
+  </style>    
+</head>
+<body>
+
+<div class="container-fluid bg-1 text-center">
+    <h3>Let's do human action classification</h3>  
+    <div > 
+        
+        <br><br>Video Analysis Progress bar<br><br>
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            <span class="progress-bar-label">0%</span>
+          </div>
+        </div>
+        <div id="result" style="display:none">
+          <br>Video Analysis Result<br>          
+          <div>
+          </div>          
+        </div>
+        
+    </div>
+      <table class="table">
+      <tr>
+        <td>
+            <div class="custom-file">
+                <input class="custom-file-input form-control mx-auto" type="file" id="formFile" name="file" style="width: 50%;" onchange="handleFileSelection(event)">
+            <label class="custom-file-label" for="video">Choose video to analyse</label>
+            </div>
+        </td>
+      <td>
+            <button class="btn btn-info" onclick="uploadFile()">Encrypt</button>
+      </td>
+      </tr>
+      <tr>
+        <td style="width: 65%;">
+                <video id="videoPlayer" controls style="width: 50%;">
+                    <source id="videoSource" src="" type="video/mp4">
+                </video>
+        </td>
+        <td>
+            <div class="mt-3">
+                <div id="responseContainer">
+
+                </div>
+            </div>
+        </td>
+      </tr>
+      </table>
+</div>
+
+</body>
+<script>
+
+function handleFileSelection(event) {
+    var file = event.target.files[0];
+    var videoPlayer = document.getElementById('videoPlayer');
+    var videoSource = document.getElementById('videoSource');
+
+    // Set the video source to the selected file
+    videoSource.src = URL.createObjectURL(file);
+
+    // Load the video source
+    videoPlayer.load();
+
+    // Play the video
+    videoPlayer.play();
+}
+
+function uploadFile() {
+    var fileInput = document.getElementById('formFile');
+    var file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    var progress = $('.progress-bar');
+    progress.width('0%');
+    progress.text('0%');
+    progress.removeClass('progress-bar-success').removeClass('progress-bar-danger').addClass('progress-bar-striped').addClass('active');
+
+    var intervalId = setInterval(function () {
+        // Update progress bar with random progress value between 0 and 90
+        var progressValue = Math.floor(Math.random() * 91);
+        progress.width(progressValue + '%');
+        progress.text(progressValue + '%');
+    }, 500); // Update progress every 500 milliseconds (adjust as needed)
+
+    $.ajax({
+        url: 'http://localhost:3000/main/test/',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            // Handle response
+            console.log('File upload successful:', response);
+            clearInterval(intervalId); // Stop the progress bar timer
+            progress.width('100%');
+            progress.text('100%');
+            progress.removeClass('progress-bar-striped').removeClass('active').addClass('progress-bar-success');
+            $("#responseContainer").html("<h3>"+response+"</h3>");
+        },
+        error: function (error) {
+            // Handle error
+            console.error('File upload error:', error);
+            clearInterval(intervalId); // Stop the progress bar timer
+            progress.removeClass('progress-bar-striped').removeClass('active').addClass('progress-bar-danger');
+        }
+    });
+}
+
+            </script>
+<script>
+  // Add the following code if you want the name of the file appear on select
+  $(".custom-file-input").on("change", function() {
+    var fileName = $(this).val().split("\\").pop();
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+  });
+ </script>
+</html>

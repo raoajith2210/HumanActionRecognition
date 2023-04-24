@@ -1,0 +1,90 @@
+<%- include('./partials/header.ejs')%>     
+    <!--Main Content-->
+    <main>
+        <div class="index-content">
+            <!-- <form id="uploadForm" action="/main/test" method="post" enctype="multipart/form-data"> -->
+            <div class="row">
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="mb-3">
+                        <h3>File upload</h3>
+                            <input class="form-control mx-auto" type="file" id="formFile" name="file" style="width: 50%;" onchange="handleFileSelection(event)">
+                            <button class="btn btn-info" onclick="uploadFile()">Encrypt</button>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <table align="center" id="uploadFileInfo">
+                            <tr>
+                                <td>File Name</td>
+                                <td>&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                                <td>No file selected</td>
+                            </tr>
+                            <tr>
+                                <td>File Size</td>
+                                <td>&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                                <td>0 Kb</td>
+                            </tr>
+                        </table>
+                    </div>            
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <br>
+                        <div id="responseContainer">
+                            <%= dataToRender %>
+                        </div>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+                
+                <!-- </form> -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+function uploadFile() {
+    var fileInput = document.getElementById('formFile');
+    var file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    $.ajax({
+        url: 'http://localhost:5000/upload/',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Handle response
+            console.log('File upload successful:', response);
+            $("#responseContainer").html(response)
+        },
+        error: function(error) {
+            // Handle error
+            console.error('File upload error:', error);
+        }
+    });
+}
+
+        </script>
+        <script>
+            const socket = io(); // Connect to the server using socket.io
+        
+            // Listen for 'data' event from the server
+            socket.on('data', function(data) {
+              // Handle the received data on the client-side
+              $('#responseContainer').append(data);
+            });
+        
+            // AJAX request to fetch data from the server
+            $.get('/data', function(data) {
+              // Handle the received data on the client-side
+              $('#responseContainer').append(data);
+            });
+          </script>
+
+<%- include('./partials/footer.ejs')%>
+
+        
