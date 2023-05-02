@@ -1,8 +1,8 @@
 # HumanActionRecognition
 
-We can run the project locally or over the cloud. 
+# We can run the project locally or over the cloud. 
 
-Setup to run the project over the cloud:
+# Setup to run the project over the cloud:
 1. Access the below URL to view the web application.
 	https://har-ccn.herokuapp.com/
 
@@ -34,7 +34,7 @@ The predicted action label will be transmitted to the front-end and will be disp
 
 
 
-Setup to run the project in local machine:
+# Setup to run the project in local machine:
 
 
 Prerequisites:
@@ -74,16 +74,18 @@ Visual Studio is an integrated development environment (IDE) developed by Micros
 To setup and run the project in local:
 
 1.	Open command prompt
-2.	Navigate to the project folder “front-end”
+2.	Navigate to the project folder “test-ccn”
 3.	Run the following commands. 
 		“npm install”
 		“npm install -g nodemon”
 		“nodemon app”
 4.	Now, open another terminal 
-5.	Navigate to the project folder “back-end”
+5.	Navigate to the project folder “har-main”
 6.	Run following commands.
 		“pip install flask”
 		“pip install numpy”
+		"pip install gdown"
+		"pip install opencv-python"
 		“python app.py”
 7.	Now, download some sample videos from the below links.
 	https://www.pexels.com/video/a-woman-playing-flute-8927326/
